@@ -33,20 +33,23 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    # テスト
+    - name: Run tests
+      run: ./gradlew test
+
+    - name: Upload test results
+      if: always() # テストが失敗しても結果をアップロードする
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: build/reports/tests/
+
+    # ビルド
     - name: Build with Gradle Wrapper
       run: ./gradlew build
+      if: success() # テストが成功した場合のみビルドを実行
 
-    # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-    #   with:
-    #     gradle-version: '8.9'
-    #
-    # - name: Build with Gradle 8.9
-    #   run: gradle build
-
+  # 依存関係リストの作成と送信
   dependency-submission:
 
     runs-on: ubuntu-latest
